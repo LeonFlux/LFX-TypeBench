@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Typed Decisions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-BQ_sR0Rx.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-3lKP0Zwn.css">
+</head>
+<body class="bg-base-200 text-base-content min-h-screen">
+
+<header class="navbar sticky top-0 z-30 bg-neutral text-neutral-content flex-wrap gap-x-8 gap-y-2 px-4 md:px-7 py-2">
+    <a href="#define" class="flex items-center gap-2.5" aria-label="Typed Decisions, back to Define">
+        <svg width="22" height="22" aria-hidden="true"><use href="/assets/icons-d9200a7a.svg#24-solid-square-3-stack-3d"/></svg>
+        <span class="font-bold text-base tracking-tight">Typed Decisions</span>
+    </a>
+    <nav aria-label="Views" class="ml-auto" id="nav">
+        <ul class="menu menu-horizontal menu-sm gap-2 [--menu-active-bg:var(--color-primary)] [--menu-active-fg:var(--color-primary-content)] [&_a:not(.menu-active)]:bg-primary/20">
+            <li><a href="#define" data-nav="define">1. Define</a></li>
+            <li><a href="#results" data-nav="results">2. Results</a></li>
+            <li><a href="#inspect" data-nav="inspect">3. Inspect</a></li>
+            <li><a href="#calibrate" data-nav="calibrate">4. Calibrate</a></li>
+        </ul>
+    </nav>
+    <div class="flex items-center gap-2" id="h-run" aria-live="polite">
+        <span class="text-xs opacity-80"><span data-variant-of="run-state" data-variant="idle">ready</span><span
+                data-variant-of="run-state" data-variant="running" hidden><span data-slot="h-kind"></span> <span
+                data-slot="h-done"></span>/<span data-slot="h-total"></span></span><span data-variant-of="run-state"
+                                                                                         data-variant="done" hidden>last run finished</span><span
+                data-variant-of="run-state" data-variant="stopped" hidden>last run stopped</span></span>
+        <button type="button" id="h-run-btn" class="btn btn-primary btn-xs">Run</button>
+        <button type="button" id="h-stop-btn" class="btn btn-warning btn-xs" hidden>Stop</button>
+    </div>
+</header>
+
+<main class="max-w-[1400px] mx-auto p-4 md:p-7 grid gap-6 lg:grid-cols-[200px_minmax(0,1fr)] items-start">
+    <nav aria-labelledby="decisions-h" class="flex flex-col gap-2 min-w-0 lg:sticky lg:top-20">
+        <h2 id="decisions-h" class="section-label flex justify-between"><span>Decisions</span><span
+                data-slot="d-count"></span></h2>
+        <ul id="d-list" class="menu menu-sm bg-base-100 rounded-box border border-base-300 w-full p-1 gap-2"></ul>
+        <button type="button" id="d-new" class="btn btn-outline btn-sm">+ New decision</button>
+        <p class="text-xs text-base-content/60">Run uses the selected decision.</p>
+        <button type="button" id="d-restore" class="link link-primary text-xs text-left w-fit" hidden>Re-add the default
+            decisions
+        </button>
+    </nav>
+
+    <div class="flex flex-col gap-6 min-w-0">
+        <section id="run-bar" aria-label="Run history" class="card bg-base-100 border border-base-300" hidden>
+            <div class="card-body gap-2 py-3">
+                <div class="flex flex-wrap items-end gap-2">
+                    <fieldset class="fieldset min-w-0 flex-1 py-0">
+                        <legend class="fieldset-legend">Run</legend>
+                        <select id="rb-run" class="select select-sm w-full"></select>
+                    </fieldset>
+                    <button type="button" id="rb-delete" class="btn btn-ghost btn-sm">Delete this run</button>
+                    <button type="button" id="rb-delete-all" class="btn btn-ghost btn-sm">Delete all runs of this
+                        decision
+                    </button>
+                </div>
+                <p class="text-xs text-base-content/60">
+                    <span data-variant-of="history" data-variant="some"><span data-slot="rb-count"></span> runs for this decision.</span><span
+                        data-variant-of="history" data-variant="none" hidden>No runs for this decision yet.</span>
+                    <button type="button" id="rb-clear" class="link link-error">Clear all history</button>
+                </p>
+                <p class="text-xs text-warning" data-pruned hidden><span data-slot="rb-dropped"></span> oldest runs were
+                    removed from the history.</p>
+            </div>
+        </section>
+
+        <!-- ============================ 1 · DEFINE ============================ -->
+        <section data-view="define" aria-labelledby="define-h"
+                 class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px] items-start">
+
+            <div class="flex flex-col gap-5 min-w-0">
+                <div class="flex flex-wrap items-baseline justify-between gap-3">
+                    <h1 id="define-h" class="text-3xl font-semibold tracking-tight">Define the decision</h1>
+                    <span class="text-xs text-base-content/60">One input · <span
+                            data-slot="q-count"></span> questions</span>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body gap-4">
+                        <div class="grid gap-4 sm:grid-cols-[2fr_1fr_100px]">
+                            <fieldset class="fieldset py-0">
+                                <legend class="fieldset-legend">Name</legend>
+                                <input id="d-name" type="text" class="input w-full" autocomplete="off">
+                            </fieldset>
+                            <fieldset class="fieldset py-0">
+                                <legend class="fieldset-legend">Id</legend>
+                                <input id="d-id" type="text" class="input w-full font-mono" autocomplete="off"
+                                       spellcheck="false">
+                            </fieldset>
+                            <fieldset class="fieldset py-0">
+                                <legend class="fieldset-legend">Version <span class="tooltip tooltip-left"
+                                                                              data-tip="Bump it when you change the input or questions, so runs of different versions stay apart."><button
+                                        type="button" class="opacity-60 cursor-help"
+                                        aria-label="About version: bump it when you change the input or questions, so runs of different versions stay apart.">ⓘ</button></span>
+                                </legend>
+                                <input id="d-version" type="number" min="1" step="1" class="input w-full font-mono">
+                            </fieldset>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="fieldset-legend py-0" id="input-label">Input</span>
+                            <div class="join" role="radiogroup" aria-label="Input format">
+                                <input class="join-item btn btn-sm" type="radio" name="input-format" value="text"
+                                       aria-label="Text">
+                                <input class="join-item btn btn-sm" type="radio" name="input-format" value="json"
+                                       aria-label="JSON">
+                            </div>
+                        </div>
+                        <textarea id="d-input" rows="5" class="textarea w-full leading-relaxed"
+                                  aria-labelledby="input-label" spellcheck="false"></textarea>
+                        <div class="flex flex-col gap-2">
+                            <span class="text-xs text-base-content/60">Parts removed one at a time by the knockout test:</span>
+                            <ul id="segments" class="flex flex-wrap gap-1.5"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="q-list" class="flex flex-col gap-3"></div>
+
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-sm self-center mr-1">Add a question:</span>
+                    <button type="button" class="btn btn-outline btn-sm" data-add-question="choice">+ Choice</button>
+                    <button type="button" class="btn btn-outline btn-sm" data-add-question="yes-no">+ Yes/No</button>
+                    <button type="button" class="btn btn-outline btn-sm" data-add-question="score">+ Score</button>
+                </div>
+
+                <div id="validation" role="alert" class="alert alert-error alert-soft items-start" hidden>
+                    <div class="flex flex-col gap-1">
+                        <span class="font-semibold">Fix these before running</span>
+                        <ul id="validation-list" class="list-disc pl-5 text-sm"></ul>
+                    </div>
+                </div>
+
+                <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                    <summary class="collapse-title font-semibold">Decision as sent to the models</summary>
+                    <div class="collapse-content">
+                        <pre id="schema-json"
+                             class="bg-neutral text-neutral-content rounded-box p-3 text-xs overflow-x-auto"></pre>
+                    </div>
+                </details>
+            </div>
+
+            <aside aria-labelledby="models-h" class="flex flex-col gap-4 min-w-0">
+                <h2 id="models-h" class="text-3xl font-semibold">Models</h2>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body gap-2 p-4">
+                        <fieldset class="fieldset py-0">
+                            <legend class="fieldset-legend">OpenRouter API key</legend>
+                            <span class="join w-full">
+            <input id="k-key" type="password" class="input input-sm join-item w-full font-mono" autocomplete="off"
+                   spellcheck="false" placeholder="sk-or-…">
+            <button type="button" id="k-clear" class="btn btn-sm join-item">Clear</button>
+          </span>
+                            <p class="label" data-variant-of="key-source" data-variant="browser">Forgotten when you
+                                close this tab.</p>
+                            <p class="label text-success" data-variant-of="key-source" data-variant="server" hidden>
+                                Using the server's key. Type a key to use your own.</p>
+                            <p class="label text-warning" data-variant-of="key-source" data-variant="override" hidden>
+                                Using your key instead of the server's.</p>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <h3 class="section-label">Local models</h3>
+                    <div class="card card-dash border-base-content/30">
+                        <div class="card-body items-start gap-2 p-4">
+                            <button type="button" class="btn btn-outline btn-sm" disabled>+ Add local model</button>
+                            <p class="text-sm text-base-content/70">Models running locally. <span data-variant-of="mode"
+                                                                                                  data-variant="static">Available with a local server.</span><span
+                                    data-variant-of="mode" data-variant="server"
+                                    hidden>Not supported by this server.</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <h3 class="section-label">Remote models</h3>
+                    <div id="model-groups" class="flex flex-col gap-2"></div>
+                    <div class="card card-dash border-base-content/30">
+                        <div class="card-body items-start gap-2 p-4">
+                            <button type="button" class="btn btn-outline btn-sm" id="m-add-remote" aria-controls="m-add"
+                                    aria-expanded="false">+ Add remote model
+                            </button>
+                            <p class="text-sm text-base-content/70">Models from OpenRouter. <span
+                                    data-variant-of="catalog-state" data-variant="loading">Loading the list…</span><span
+                                    data-variant-of="catalog-state" data-variant="ready" hidden><span
+                                    data-slot="catalog-count"></span> available.</span><span
+                                    data-variant-of="catalog-state" data-variant="offline" hidden>The list could not be loaded.</span>
+                            </p>
+                            <form id="m-add" class="flex flex-col gap-1.5 w-full" hidden>
+          <span class="join w-full">
+            <input type="text" list="m-catalog" class="input input-sm join-item w-full font-mono"
+                   placeholder="vendor/model" aria-label="OpenRouter model id" spellcheck="false" autocomplete="off">
+            <button type="submit" class="btn btn-sm join-item">Add</button>
+          </span>
+                                <datalist id="m-catalog"></datalist>
+                                <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox"
+                                                                                                     id="m-free-only"
+                                                                                                     class="checkbox checkbox-xs">
+                                    Free models only</label>
+                                <span class="label text-error" data-add-error hidden><span data-variant-of="add-error"
+                                                                                           data-variant="unknown">No OpenRouter model with this id.</span><span
+                                        data-variant-of="add-error" data-variant="duplicate">Already in the list.</span><span
+                                        data-variant-of="add-error" data-variant="offline">The model list is still loading; try again in a moment.</span></span>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <h3 class="section-label">Harnessed models</h3>
+                    <div class="card card-dash border-base-content/30">
+                        <div class="card-body items-start gap-2 p-4">
+                            <button type="button" class="btn btn-outline btn-sm" disabled>+ Add harnessed model</button>
+                            <p class="text-sm text-base-content/70">Models used through a command-line tool, such as
+                                Claude Code. <span data-variant-of="mode" data-variant="static">Available with a local server.</span><span
+                                        data-variant-of="mode" data-variant="server" hidden>Not supported by this server.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body gap-3 p-4">
+                        <h3 class="section-label">Run settings</h3>
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span id="samples-label" class="flex items-center gap-1.5">Samples <span
+                                    class="tooltip tooltip-left"
+                                    data-tip="Models that can&#39;t report probabilities answer each question this many times; the share of each answer becomes its probability."><button
+                                    type="button" class="opacity-60 cursor-help"
+                                    aria-label="About samples: Models that can&#39;t report probabilities answer each question this many times; the share of each answer becomes its probability.">ⓘ</button></span></span>
+                            <div class="join" role="radiogroup" aria-labelledby="samples-label">
+                                <input class="join-item btn btn-sm" type="radio" name="samples" value="5"
+                                       aria-label="5">
+                                <input class="join-item btn btn-sm" type="radio" name="samples" value="10"
+                                       aria-label="10">
+                                <input class="join-item btn btn-sm" type="radio" name="samples" value="20"
+                                       aria-label="20">
+                                <input class="join-item btn btn-sm" type="radio" name="samples" value="40"
+                                       aria-label="40">
+                                <input id="s-samples" type="number" min="1" max="100" step="1"
+                                       class="join-item input input-sm w-20" aria-label="Custom number of samples"
+                                       placeholder="custom">
+                            </div>
+                        </div>
+                        <label class="flex items-center justify-between gap-2">
+                            <span class="flex items-center gap-1.5">Requests per minute <span
+                                    class="tooltip tooltip-left"
+                                    data-tip="Calls are spaced to stay under this limit. Free OpenRouter models allow about 20 per minute. 0 means no limit."><button
+                                    type="button" class="opacity-60 cursor-help"
+                                    aria-label="About requests per minute: Calls are spaced to stay under this limit. Free OpenRouter models allow about 20 per minute. 0 means no limit.">ⓘ</button></span></span>
+                            <input id="s-rpm" type="number" min="0" max="600" step="1" class="input input-sm w-28">
+                        </label>
+                        <label class="flex items-center justify-between gap-2">
+                            <span class="flex items-center gap-1.5">Seed <span class="tooltip tooltip-left"
+                                                                               data-tip="The same seed and settings repeat the same answers on models that accept a seed."><button
+                                    type="button" class="opacity-60 cursor-help"
+                                    aria-label="About seed: The same seed and settings repeat the same answers on models that accept a seed.">ⓘ</button></span></span>
+                            <input id="s-seed" type="number" step="1" class="input input-sm w-28">
+                        </label>
+                        <label class="flex items-center justify-between gap-2 cursor-pointer">
+                            <span class="flex items-center gap-1.5">Collect reasoning <span class="tooltip tooltip-left"
+                                                                                            data-tip="Asks models to return their thinking, shown run by run on Inspect. Uses more tokens."><button
+                                    type="button" class="opacity-60 cursor-help"
+                                    aria-label="About collecting reasoning: Asks models to return their thinking, shown run by run on Inspect. Uses more tokens.">ⓘ</button></span></span>
+                            <input id="s-reasoning" type="checkbox"
+                                   class="toggle checked:border-green-500 checked:bg-green-400 toggle-sm">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="rounded-box bg-neutral text-neutral-content p-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-semibold"><span data-slot="planned-calls"></span> calls</span>
+                        <span class="text-xs opacity-75"><span
+                                data-slot="planned-models"></span> models · rough cost <span
+                                data-slot="planned-cost"></span> · <span data-slot="planned-time"></span></span>
+                        <span class="text-xs text-warning" data-needs-key
+                              hidden>Add an OpenRouter API key to run.</span>
+                    </div>
+                    <button type="button" id="run-btn" class="btn btn-primary ml-auto">
+                        <svg width="14" height="14" aria-hidden="true"><use href="/assets/icons-d9200a7a.svg#16-solid-play"/></svg>
+                        Run decision
+                    </button>
+                    <div id="run-progress" class="w-full flex items-center gap-3" hidden>
+                        <progress class="progress progress-primary flex-1" max="1" value="0"></progress>
+                        <span class="text-xs"><span data-slot="run-done"></span>/<span
+                                data-slot="run-total"></span></span>
+                        <button type="button" id="run-cancel" class="btn btn-ghost btn-xs">Stop</button>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <!-- ============================ 2 · RESULTS ============================ -->
+        <section data-view="results" aria-labelledby="results-h" class="flex flex-col gap-6" hidden>
+            <div data-empty class="card bg-base-100 border border-base-300">
+                <div class="card-body items-start">
+                    <h1 class="text-2xl font-semibold">No run yet for this decision</h1>
+                    <p>Pick models and run it, or select another decision on the left.</p>
+                    <a href="#define" class="btn btn-outline btn-sm">Go to Define</a>
+                </div>
+            </div>
+
+            <div data-filled class="flex flex-col gap-6" hidden>
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <div class="flex flex-col gap-1">
+                        <h1 id="results-h" class="text-3xl font-semibold tracking-tight">Model decisions</h1>
+                        <p class="text-base-content/70">Probabilities and answers.</p>
+                    </div>
+                    <div role="tablist" aria-label="Question" id="r-qtabs" class="tabs tabs-box"></div>
+                </div>
+
+                <div id="r-stopped" role="status" class="alert alert-info alert-soft" hidden>
+                    <span>This run was stopped early. Only finished prompts are shown.</span>
+                </div>
+
+                <div id="r-errors" role="alert" class="alert alert-warning alert-soft items-start" hidden>
+                    <div class="flex flex-col gap-1">
+                        <span class="font-semibold">Some models failed and are left out</span>
+                        <ul id="r-error-list" class="text-sm"></ul>
+                    </div>
+                </div>
+
+                <div class="card bg-base-100 border border-base-300">
+                    <div class="card-body flex-row flex-wrap items-center gap-3 py-4">
+                        <span class="text-base font-medium" data-slot="r-prompt"></span>
+                        <span class="badge badge-lg badge-soft ml-auto" data-verdict>
+        <span data-variant-of="verdict" data-variant="unanimous">Unanimous</span><span data-variant-of="verdict"
+                                                                                       data-variant="split">Split <span
+                                data-slot="r-agree"></span>/<span data-slot="r-total"></span></span>
+        · <span data-slot="r-consensus"></span>
+      </span>
+                    </div>
+                </div>
+
+                <div id="r-cards" class="grid gap-4 grid-cols-[repeat(auto-fit,minmax(min(300px,100%),1fr))]"></div>
+
+                <div class="grid gap-4 xl:grid-cols-2 items-start">
+                    <section aria-labelledby="div-h" class="card bg-base-100 border border-base-300">
+                        <div class="card-body gap-3">
+                            <div>
+                                <h2 id="div-h" class="text-lg font-semibold">Where the models diverge</h2>
+                                <p class="text-xs text-base-content/60">How differently each pair spreads its
+                                    probabilities: 0 = identical, 1 = no overlap.</p>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="table table-sm heat-table" id="r-matrix">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col"><span class="sr-only">Model</span></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <p class="alert alert-soft text-sm" data-maxpair>Largest gap: <strong
+                                    data-slot="r-maxpair"></strong> at <span data-slot="r-maxval"></span>.</p>
+                        </div>
+                    </section>
+
+                    <section aria-labelledby="cost-h" class="card bg-base-100 border border-base-300">
+                        <div class="card-body gap-3">
+                            <div>
+                                <h2 id="cost-h" class="text-lg font-semibold">Latency and cost</h2>
+                                <p class="text-xs text-base-content/60">For this question, including every repeated
+                                    call.</p>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="table table-sm" id="r-cost">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Model</th>
+                                        <th scope="col" class="text-right">Calls</th>
+                                        <th scope="col">Time</th>
+                                        <th scope="col" class="text-right">Tokens in / out</th>
+                                        <th scope="col" class="text-right">Cost</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <th scope="row">All questions</th>
+                                        <td class="text-right" data-slot="r-total-calls"></td>
+                                        <td data-slot="r-total-wall"></td>
+                                        <td></td>
+                                        <td class="text-right font-semibold" data-slot="r-total-cost"></td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button type="button" id="r-export" class="btn btn-outline btn-sm">Export run</button>
+                                <a href="#inspect" class="btn btn-sm">Inspect</a>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================ 3 · INSPECT ============================ -->
+        <section data-view="inspect" aria-labelledby="inspect-h" hidden>
+            <div data-empty class="card bg-base-100 border border-base-300">
+                <div class="card-body items-start">
+                    <h1 class="text-2xl font-semibold">Nothing to inspect yet</h1>
+                    <p>Run a decision first.</p>
+                    <a href="#define" class="btn btn-outline btn-sm">Go to Define</a>
+                </div>
+            </div>
+
+            <div data-filled class="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)] items-start" hidden>
+                <aside class="flex flex-col gap-4 min-w-0">
+                    <h1 id="inspect-h" class="text-3xl font-semibold tracking-tight">Inner workings</h1>
+                    <p class="text-base-content/70">As deep as each model allows.</p>
+                    <fieldset class="fieldset py-0">
+                        <legend class="fieldset-legend">Question</legend>
+                        <select id="i-question" class="select w-full"></select>
+                    </fieldset>
+                    <div role="tablist" aria-label="Model" id="i-models"
+                         class="tabs tabs-box flex-col items-stretch"></div>
+
+                    <ul class="list bg-base-100 rounded-box border border-base-300" id="i-ladder">
+                        <li class="list-row" data-cap="probabilities">
+                            <span class="status" aria-hidden="true"></span>
+                            <div>
+                                <div class="font-semibold">Probabilities</div>
+                                <p class="text-xs text-base-content/60" data-variant-of="probabilities"
+                                   data-variant="logprobs">Reported by the model for each option.</p>
+                                <p class="text-xs text-base-content/60" data-variant-of="probabilities"
+                                   data-variant="sampled">Estimated from the share of N answers.</p></div>
+                            <span class="text-xs" data-status></span>
+                        </li>
+                        <li class="list-row" data-cap="reasoning">
+                            <span class="status" aria-hidden="true"></span>
+                            <div>
+                                <div class="font-semibold">Reasoning</div>
+                                <p class="text-xs text-base-content/60" data-variant-of="reasoning"
+                                   data-variant="returned">The model&#39;s thinking, run by run.</p>
+                                <p class="text-xs text-base-content/60" data-variant-of="reasoning" data-variant="none">
+                                    Not returned by this model.</p></div>
+                            <span class="text-xs" data-status></span>
+                        </li>
+                        <li class="list-row" data-cap="attribution">
+                            <span class="status" aria-hidden="true"></span>
+                            <div>
+                                <div class="font-semibold">Word influence</div>
+                                <p class="text-xs text-base-content/60">Which words drove the answer. Needs a local
+                                    model.</p></div>
+                            <span class="text-xs" data-status></span>
+                        </li>
+                        <li class="list-row" data-cap="knockout">
+                            <span class="status" aria-hidden="true"></span>
+                            <div>
+                                <div class="font-semibold">Knockout</div>
+                                <p class="text-xs text-base-content/60">Removes each part of the input and measures the
+                                    shift.</p></div>
+                            <span class="text-xs" data-status></span>
+                        </li>
+                    </ul>
+                    <template id="tpl-status">
+                        <span data-variant-of="status" data-variant="direct">reported</span><span
+                            data-variant-of="status" data-variant="estimated">estimated</span><span
+                            data-variant-of="status" data-variant="closed">not available</span>
+                    </template>
+                </aside>
+
+                <div class="flex flex-col gap-4 min-w-0">
+                    <section class="card bg-base-100 border border-base-300" aria-labelledby="i-dist-h">
+                        <div class="card-body gap-3">
+                            <div class="flex flex-wrap items-baseline justify-between gap-2">
+                                <h2 id="i-dist-h" class="text-lg font-semibold">Distribution · <span
+                                        data-slot="i-model"></span></h2>
+                                <span class="badge badge-outline"><span data-variant-of="source"
+                                                                        data-variant="logprobs">reported</span><span
+                                        data-variant-of="source" data-variant="sampled">estimated from <span
+                                        data-slot="i-n"></span> runs</span></span>
+                            </div>
+                            <div id="i-bars" class="flex flex-col gap-2"></div>
+                            <p class="text-xs text-base-content/60" data-residual hidden><span
+                                    data-slot="i-residual"></span> of the probability fell outside the options and was
+                                left out.</p>
+                            <div data-tally hidden class="flex flex-col gap-2">
+                                <span class="text-sm">Each square is one run. Dark = <span
+                                        data-slot="i-tally-top"></span>, light = another answer, hollow = unusable reply.</span>
+                                <div id="i-tally" class="tally"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card bg-base-100 border border-base-300" aria-labelledby="i-reason-h"
+                             data-panel="reasoning">
+                        <div class="card-body gap-3">
+                            <div class="flex flex-wrap items-baseline justify-between gap-2">
+                                <h2 id="i-reason-h" class="text-lg font-semibold">Reasoning · run <span
+                                        data-slot="i-trace-index"></span> of <span data-slot="i-trace-count"></span> ·
+                                    answered <span data-slot="i-trace-answer"></span></h2>
+
+                            </div>
+                            <pre id="i-trace"
+                                 class="bg-base-200 rounded-box p-4 text-sm leading-relaxed whitespace-pre-wrap"></pre>
+                            <div class="flex flex-wrap gap-2">
+                                <button type="button" class="btn btn-sm btn-outline" id="i-trace-prev">Previous run
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline" id="i-trace-next">Next run</button>
+                                <button type="button" class="btn btn-sm btn-outline" id="i-trace-other">Jump to a run
+                                    with a different answer
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card bg-base-100 border border-base-300" aria-labelledby="i-ko-h">
+                        <div class="card-body gap-3">
+                            <div class="flex flex-wrap items-end justify-between gap-3">
+                                <div>
+                                    <h2 id="i-ko-h" class="text-lg font-semibold">Knockout</h2>
+                                    <p class="text-xs text-base-content/60">How the probability of the chosen option
+                                        shifts when each part of the input is removed.</p>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <label class="flex items-center gap-2 text-sm">Option <select id="i-ko-target"
+                                                                                                  class="select select-sm w-44"></select></label>
+                                    <button type="button" id="i-ko-run" class="btn btn-sm btn-primary">Run · <span
+                                            data-slot="i-ko-calls"></span> calls · <span data-slot="i-ko-cost"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <progress id="i-ko-progress" class="progress progress-primary" max="1" value="0"
+                                      hidden></progress>
+                            <p data-ko-empty class="text-sm text-base-content/60">Not run yet for this model and
+                                question.</p>
+                            <div data-ko-filled hidden class="flex flex-col">
+                                <div class="ko-row ko-head text-xs text-base-content/60"><span>Removed part</span><span
+                                        class="text-right">lowers</span><span>raises</span><span
+                                        class="text-right">Δ</span></div>
+                                <div id="i-ko-rows"></div>
+                                <p data-ko-noise hidden class="alert alert-warning alert-soft mt-3 text-sm">Shifts
+                                    inside ±<span data-slot="i-ko-band"></span> are within noise at <span
+                                            data-slot="i-ko-n"></span> samples. Shaded rows can't be told apart from
+                                    zero; raise the samples to resolve them.</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================ 4 · CALIBRATE ============================ -->
+        <section data-view="calibrate" aria-labelledby="cal-h" class="flex flex-col gap-6" hidden>
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div class="flex flex-col gap-1">
+                    <h1 id="cal-h" class="text-3xl font-semibold tracking-tight">Does 80% confident mean 80% right?</h1>
+                    <p class="text-base-content/70"><span data-slot="c-n"></span> sample items with known answers.
+                        Confidence is the probability of the chosen option.</p>
+                </div>
+                <div class="flex flex-wrap items-end gap-2">
+                    <fieldset class="fieldset py-0">
+                        <legend class="fieldset-legend">Question</legend>
+                        <select id="c-question" class="select select-sm w-44"></select></fieldset>
+                    <fieldset class="fieldset py-0">
+                        <legend class="fieldset-legend">Items</legend>
+                        <select id="c-size" class="select select-sm w-24">
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select></fieldset>
+                    <button type="button" id="c-run" class="btn btn-primary btn-sm">Run · <span
+                            data-slot="c-calls"></span> calls · <span data-slot="c-cost"></span></button>
+                </div>
+            </div>
+            <progress id="c-progress" class="progress progress-primary" max="1" value="0" hidden></progress>
+
+            <div data-empty class="card bg-base-100 border border-base-300">
+                <div class="card-body">
+                    <p>Runs every enabled model over sample items with known answers, then shows how well their
+                        confidence matches their accuracy. The three default decisions come with known answers;
+                        other decisions have none yet, so there is nothing to calibrate.</p>
+                </div>
+            </div>
+
+            <div data-filled class="flex flex-col gap-6" hidden>
+                <div class="flex flex-col gap-2">
+                    <div class="flex flex-wrap items-end gap-2">
+                        <fieldset class="fieldset py-0 grow min-w-0">
+                            <legend class="fieldset-legend">Calibration run</legend>
+                            <select id="c-history" class="select select-sm w-full"></select></fieldset>
+                        <button type="button" id="c-delete" class="btn btn-ghost btn-sm">Delete this calibration</button>
+                        <button type="button" id="c-delete-all" class="btn btn-ghost btn-sm">Delete all calibrations of
+                            this decision</button>
+                    </div>
+                    <p class="text-sm text-base-content/70">Question <span class="font-mono"
+                            data-slot="c-asked"></span> · decision v<span data-slot="c-version"></span> · <span
+                            data-slot="c-items"></span> items<span data-c-stopped hidden> · stopped before the end</span>
+                    </p>
+                    <p class="text-xs text-warning" data-c-pruned hidden><span data-slot="c-dropped"></span> oldest
+                        calibration runs were removed to make room.</p>
+                </div>
+                <div role="tablist" aria-label="Model" id="c-models" class="tabs tabs-box w-fit"></div>
+                <div class="grid gap-4 xl:grid-cols-2 items-start">
+                    <section class="card bg-base-100 border border-base-300" aria-labelledby="rel-h">
+                        <div class="card-body gap-3">
+                            <div class="flex flex-wrap items-baseline justify-between gap-2">
+                                <h2 id="rel-h" class="text-lg font-semibold">Calibration curve · <span
+                                        data-slot="c-model"></span></h2>
+                                <span class="text-sm">ECE <span data-slot="c-ece"></span></span>
+                            </div>
+                            <div class="reliability">
+                                <div class="rel-y" aria-hidden="true"><span>100%</span><span>50%</span><span>0%</span>
+                                </div>
+                                <div id="c-bins" class="rel-plot" role="img" aria-label="Reliability diagram"></div>
+                                <span></span>
+                                <div id="c-bin-labels" class="rel-x"></div>
+                            </div>
+                            <div class="flex flex-wrap gap-4 text-xs text-base-content/70">
+                                <span class="flex items-center gap-1.5"><span class="legend-swatch"
+                                                                              aria-hidden="true"></span>correct (accuracy)</span>
+                                <span class="flex items-center gap-1.5"><span class="legend-dash"
+                                                                              aria-hidden="true"></span>average stated confidence</span>
+                                <span>Bar below the dash = overconfident.</span>
+                            </div>
+                            <p class="alert alert-soft text-sm block" data-callout>
+                                In the busiest bin, <span data-slot="c-bin-range"></span>, <span
+                                    data-slot="c-model-2"></span> stated <span data-slot="c-bin-conf"></span> on average
+                                and was right <span data-slot="c-bin-acc"></span>:
+                                <span data-variant-of="cal" data-variant="ok">well calibrated there.</span><span
+                                    data-variant-of="cal" data-variant="over">overconfident by <span
+                                    data-slot="c-gap-over"></span> points.</span><span data-variant-of="cal"
+                                                                                       data-variant="under">underconfident by <span
+                                    data-slot="c-gap-under"></span> points.</span>
+                            </p>
+                        </div>
+                    </section>
+
+                    <section class="card bg-base-100 border border-base-300" aria-labelledby="cm-h">
+                        <div class="card-body gap-3">
+                            <div class="flex flex-wrap items-baseline justify-between gap-2">
+                                <h2 id="cm-h" class="text-lg font-semibold">Confusion matrix · <span
+                                        data-slot="c-model-3"></span></h2>
+                                <span class="text-sm">accuracy <span data-slot="c-acc"></span></span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="table table-sm heat-table" id="c-cm">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col" class="text-xs font-normal text-base-content/60">true ↓ ·
+                                            predicted →
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <p class="text-xs text-base-content/60">Shade = share of the true row. Outlined =
+                                correct. Click a cell to list its items.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="grid gap-4 xl:grid-cols-2 items-start">
+                    <section class="card bg-base-100 border border-base-300" aria-labelledby="opt-h">
+                        <div class="card-body gap-3">
+                            <h2 id="opt-h" class="text-lg font-semibold">By option · <span
+                                    data-slot="c-model-4"></span></h2>
+                            <div class="overflow-x-auto">
+                                <table class="table table-sm" id="c-options">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Option</th>
+                                        <th scope="col" class="text-right">True</th>
+                                        <th scope="col" class="text-right">Picked</th>
+                                        <th scope="col" class="text-right">Precision</th>
+                                        <th scope="col" class="text-right">Recall</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <p class="text-xs text-base-content/60">Precision: share of its picks that were right.
+                                Recall: share of the items it should have picked that it did. — means undefined.</p>
+                        </div>
+                    </section>
+
+                    <section class="card bg-base-100 border border-base-300" aria-labelledby="agree-h" id="c-agreement">
+                        <div class="card-body gap-3">
+                            <h2 id="agree-h" class="text-lg font-semibold">Model agreement</h2>
+                            <p class="text-sm">All models picked the same option on <span
+                                    data-slot="c-unanimous"></span> of the items they all answered. All right: <span
+                                    data-slot="c-all-right"></span> · all wrong: <span data-slot="c-all-wrong"></span>
+                                · split: <span data-slot="c-split"></span>.</p>
+                            <div class="overflow-x-auto">
+                                <table class="table table-sm heat-table" id="c-pairs">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col" class="text-xs font-normal text-base-content/60">same pick</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <p class="text-xs text-base-content/60">Share of items both models answered where they
+                                picked the same option.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <section class="card bg-base-100 border border-base-300" aria-labelledby="sum-h">
+                    <div class="card-body gap-3">
+                        <h2 id="sum-h" class="text-lg font-semibold">All models on this batch</h2>
+                        <div class="overflow-x-auto">
+                            <table class="table table-sm" id="c-summary">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Model</th>
+                                    <th scope="col">Probabilities</th>
+                                    <th scope="col" class="text-right">Accuracy</th>
+                                    <th scope="col" class="text-right">Confidence</th>
+                                    <th scope="col" class="text-right">Gap</th>
+                                    <th scope="col" class="text-right">ECE</th>
+                                    <th scope="col" class="text-right">Brier</th>
+                                    <th scope="col" class="text-right">Answered</th>
+                                    <th scope="col" class="text-right">Failed</th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <p class="text-xs text-base-content/60">Confidence: average probability of the chosen
+                            option. Gap: confidence minus accuracy, positive = overconfident. ECE: average gap per
+                            confidence bin. Brier: error of the full distribution. Lower is better for both.</p>
+                    </div>
+                </section>
+
+                <section class="card bg-base-100 border border-base-300" aria-labelledby="items-h">
+                    <div class="card-body gap-3">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <h2 id="items-h" class="text-lg font-semibold">Items · <span data-slot="c-model-5"></span>
+                            </h2>
+                            <span class="text-sm"><span data-slot="c-shown"></span> shown</span>
+                        </div>
+                        <div role="tablist" aria-label="Filter items" id="c-filters"
+                             class="tabs tabs-box tabs-sm w-fit flex-wrap">
+                            <button type="button" role="tab" class="tab" data-filter="all">All · <span
+                                    data-slot="count"></span></button>
+                            <button type="button" role="tab" class="tab" data-filter="wrong">Wrong · <span
+                                    data-slot="count"></span></button>
+                            <button type="button" role="tab" class="tab" data-filter="confidently-wrong"
+                                    title="Wrong with at least 80% confidence">Confidently wrong · <span
+                                    data-slot="count"></span></button>
+                            <button type="button" role="tab" class="tab" data-filter="disagree">Models disagree · <span
+                                    data-slot="count"></span></button>
+                            <button type="button" role="tab" class="tab" data-filter="all-wrong">All models wrong ·
+                                <span data-slot="count"></span></button>
+                            <button type="button" role="tab" class="tab" data-filter="failed">Failed · <span
+                                    data-slot="count"></span></button>
+                        </div>
+                        <div id="c-drill" class="flex items-center gap-2 text-sm" hidden>
+                            <span class="badge badge-primary badge-soft"><span data-variant-of="drill"
+                                    data-variant="bin">Confidence <span data-slot="c-drill-bin"></span></span><span
+                                    data-variant-of="drill" data-variant="cell">True <span
+                                    data-slot="c-drill-truth"></span> · predicted <span
+                                    data-slot="c-drill-predicted"></span></span></span>
+                            <button type="button" id="c-drill-clear" class="link text-xs">Clear</button>
+                        </div>
+                        <div class="overflow-auto max-h-[28rem]">
+                            <table class="table table-sm table-pin-rows" id="c-items">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Input</th>
+                                    <th scope="col">Known</th>
+                                    <th scope="col">Answer</th>
+                                    <th scope="col" class="text-right">Confidence</th>
+                                    <th scope="col"><span class="sr-only">Open</span></th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <p class="text-sm text-base-content/60" data-c-no-items hidden>No items match.</p>
+                        <div id="c-item" class="flex flex-col gap-3 border-t border-base-300 pt-3" hidden>
+                            <div class="flex items-baseline justify-between gap-2">
+                                <h3 class="font-semibold">Item <span data-slot="c-item-n"></span> · known answer <span
+                                        data-slot="c-item-truth"></span></h3>
+                                <button type="button" id="c-item-close" class="btn btn-ghost btn-xs btn-square"
+                                        aria-label="Close item">
+                                    <svg width="12" height="12" aria-hidden="true"><use href="/assets/icons-d9200a7a.svg#16-solid-x-mark"/></svg>
+                                </button>
+                            </div>
+                            <pre class="whitespace-pre-wrap break-words text-sm bg-base-200 rounded-box p-3"
+                                 data-slot="c-item-input"></pre>
+                            <div id="c-item-models" class="grid gap-3 md:grid-cols-2"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- ============================ TEMPLATES ============================ -->
+<template id="tpl-decision">
+    <li class="flex-row items-center gap-0">
+        <button type="button" class="flex-1 flex-col items-start gap-0.5" data-select-decision><span
+                class="font-semibold leading-tight" data-slot="name">Decision</span><span
+                class="text-xs opacity-60"><span data-slot="questions"></span> questions · v<span
+                data-slot="version"></span></span></button>
+        <button type="button" class="btn btn-ghost btn-xs btn-square p-0" data-remove-decision aria-label="Remove decision"
+                title="Remove">
+            <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons-d9200a7a.svg#24-outline-x-mark"/></svg>
+        </button>
+    </li>
+</template>
+
+<template id="tpl-segment">
+    <li class="badge badge-ghost h-auto py-1 text-left whitespace-normal"><span class="text-xs opacity-60 mr-1"
+                                                                                data-slot="id"></span><span
+            data-slot="text"></span></li>
+</template>
+
+<template id="tpl-question">
+    <article class="card bg-base-100 border border-base-300">
+        <div class="card-body gap-3 py-4">
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <span class="badge badge-neutral">Q<span data-slot="n"></span></span>
+                <label class="flex items-center gap-2"><span class="sr-only">Question id</span><input type="text"
+                                                                                                      class="input input-sm font-mono w-40"
+                                                                                                      data-field="id"
+                                                                                                      spellcheck="false"></label>
+                <div class="join ml-auto" role="radiogroup" aria-label="Question type">
+                    <input class="join-item btn btn-sm" type="radio" value="choice" aria-label="Choice" data-type-radio>
+                    <input class="join-item btn btn-sm" type="radio" value="yes-no" aria-label="Yes/No" data-type-radio>
+                    <input class="join-item btn btn-sm" type="radio" value="score" aria-label="Score" data-type-radio>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm btn-square" data-remove aria-label="Remove question">
+                    <svg width="16" height="16" aria-hidden="true"><use href="/assets/icons-d9200a7a.svg#24-outline-x-mark"/></svg>
+                </button>
+            </div>
+            <label class="flex flex-col gap-1"><span class="sr-only">Question prompt</span><input type="text"
+                                                                                                  class="input w-full text-base"
+                                                                                                  data-field="prompt"></label>
+
+            <div data-type-area="choice" class="flex flex-wrap items-center gap-2">
+                <ul class="flex flex-wrap gap-2" data-options></ul>
+                <form class="join" data-add-option>
+                    <input type="text" class="input input-sm join-item w-40" placeholder="New option"
+                           aria-label="New option">
+                    <button type="submit" class="btn btn-sm join-item">Add</button>
+                </form>
+            </div>
+            <div data-type-area="yes-no" class="flex gap-2"><span class="badge badge-outline">yes</span><span
+                    class="badge badge-outline">no</span></div>
+            <div data-type-area="score" class="flex flex-wrap items-center gap-3">
+                <label class="flex items-center gap-2 text-sm">from <input type="number" step="1"
+                                                                           class="input input-sm w-20" data-field="min"></label>
+                <label class="flex items-center gap-2 text-sm">to <input type="number" step="1"
+                                                                         class="input input-sm w-20"
+                                                                         data-field="max"></label>
+            </div>
+            <p class="text-xs text-base-content/60">Scored as
+                <span data-variant-of="scored" data-variant="choice">a probability for each option.</span>
+                <span data-variant-of="scored" data-variant="yes-no">P(yes) and P(no).</span>
+                <span data-variant-of="scored" data-variant="score">a distribution over the scale and its expected value.</span>
+            </p>
+        </div>
+    </article>
+</template>
+
+<template id="tpl-option">
+    <li class="badge badge-outline gap-1 h-8 pl-3 pr-1"><span data-slot="label"></span>
+        <button type="button" class="btn btn-ghost btn-xs btn-circle" data-remove-option aria-label="Remove option">
+            <svg width="12" height="12" aria-hidden="true"><use href="/assets/icons-d9200a7a.svg#16-solid-x-mark"/></svg>
+        </button>
+    </li>
+</template>
+
+<template id="tpl-error">
+    <li><span data-variant-of="err" data-variant="name-required">Give the decision a name.</span><span
+            data-variant-of="err"
+            data-variant="id-invalid">Id must be a lowercase slug (letters, digits, - or _).</span><span
+            data-variant-of="err" data-variant="input-required">Add an input.</span><span data-variant-of="err"
+                                                                                          data-variant="input-json-invalid">Input is not valid JSON.</span><span
+            data-variant-of="err" data-variant="input-too-large">Input is too large.</span><span data-variant-of="err"
+                                                                                                 data-variant="no-questions">Add at least one question.</span><span
+            data-variant-of="err" data-variant="too-many-questions">Too many questions.</span><span
+            data-variant-of="err" data-variant="question-id-required">Every question needs an id.</span><span
+            data-variant-of="err" data-variant="question-id-duplicate">Question ids must be unique.</span><span
+            data-variant-of="err" data-variant="prompt-required">Every question needs a prompt.</span><span
+            data-variant-of="err" data-variant="choice-min-options">A choice needs at least two options.</span><span
+            data-variant-of="err" data-variant="too-many-options">Too many options.</span><span data-variant-of="err"
+                                                                                                data-variant="option-blank">Options can't be blank.</span><span
+            data-variant-of="err" data-variant="choice-duplicate-options">Options must be unique.</span><span
+            data-variant-of="err" data-variant="score-range-invalid">Score range must be whole numbers, low to high, at most <span
+            data-slot="max-steps"></span> steps.</span><span data-variant-of="err" data-variant="type-unknown">Unknown question type.</span><span
+            data-variant-of="err" data-variant="invalid">This field is invalid.</span> <span class="opacity-60"
+                                                                                             data-slot="path"></span>
+    </li>
+</template>
+
+<template id="tpl-model">
+    <div class="card bg-base-100 border border-base-300" data-model-card>
+        <div class="card-body gap-2.5 p-4">
+            <div class="flex items-center gap-3">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" class="checkbox checkbox-sm" data-enable>
+                    <span class="status status-lg" data-model-color aria-hidden="true"></span>
+                    <span class="font-semibold" data-slot="label">Model</span>
+                </label>
+                <button type="button" class="btn btn-ghost btn-xs btn-square ml-auto" data-remove-model
+                        aria-label="Remove model" title="Remove">
+                    <svg width="12" height="12" aria-hidden="true"><use href="/assets/icons-d9200a7a.svg#16-solid-x-mark"/></svg>
+                </button>
+            </div>
+            <dl class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                <div class="flex items-center gap-1.5" data-capline="probabilities"
+                     title="How the probability of each option is obtained."><span class="status"
+                                                                                   aria-hidden="true"></span>
+                    <dt class="opacity-60">Probabilities</dt>
+                    <dd class="font-medium"><span data-variant-of="probabilities"
+                                                  data-variant="logprobs">reported</span><span
+                            data-variant-of="probabilities" data-variant="sampled">estimated</span></dd>
+                </div>
+                <div class="flex items-center gap-1.5" data-capline="reasoning"
+                     title="Whether the model returns its thinking."><span class="status" aria-hidden="true"></span>
+                    <dt class="opacity-60">Reasoning</dt>
+                    <dd class="font-medium"><span data-variant-of="reasoning" data-variant="none">none</span><span
+                            data-variant-of="reasoning" data-variant="optional">optional · <span
+                            data-slot="effort"></span></span><span data-variant-of="reasoning" data-variant="always">always · <span
+                            data-slot="effort"></span></span></dd>
+                </div>
+                <div class="flex items-center gap-1.5" data-capline="seed"
+                     title="Whether the same seed repeats the same answers."><span class="status"
+                                                                                   aria-hidden="true"></span>
+                    <dt class="opacity-60">Seed</dt>
+                    <dd class="font-medium"><span data-variant-of="seed" data-variant="true">accepted</span><span
+                            data-variant-of="seed" data-variant="false">ignored</span></dd>
+                </div>
+                <div class="flex items-center gap-1.5" data-capline="temperature"
+                     title="Whether sampling randomness can be set."><span class="status" aria-hidden="true"></span>
+                    <dt class="opacity-60">Temperature</dt>
+                    <dd class="font-medium"><span data-variant-of="temperature"
+                                                  data-variant="true">adjustable</span><span
+                            data-variant-of="temperature" data-variant="false">fixed</span></dd>
+                </div>
+                <div class="flex items-center gap-1.5" data-capline="context"
+                     title="Longest input plus answer the model accepts."><span class="status"
+                                                                                aria-hidden="true"></span>
+                    <dt class="opacity-60">Context</dt>
+                    <dd class="font-medium"><span data-slot="context"></span></dd>
+                </div>
+                <div class="flex items-center gap-1.5" data-capline="price"
+                     title="USD per million input / output tokens."><span class="status" aria-hidden="true"></span>
+                    <dt class="opacity-60">Price</dt>
+                    <dd class="font-medium"><span data-slot="pricing"></span></dd>
+                </div>
+                <div class="flex items-center gap-1.5" data-capline="attribution" title="Which words drove the answer.">
+                    <span class="status" aria-hidden="true"></span>
+                    <dt class="opacity-60">Word influence</dt>
+                    <dd class="font-medium"><span data-variant-of="attribution"
+                                                  data-variant="true">available</span><span
+                            data-variant-of="attribution" data-variant="false">not available</span></dd>
+                </div>
+            </dl>
+            <p class="text-xs opacity-60 break-all">
+                <strong>ID:</strong> <span data-slot="model-id"></span><br/>
+                <strong>Version:</strong> <span data-slot="version"></span></p>
+        </div>
+    </div>
+</template>
+
+<template id="tpl-qtab">
+    <button type="button" role="tab" class="tab h-auto flex-col items-start py-1.5"><span
+            class="text-xs opacity-70">Q<span data-slot="n"></span> · <span data-variant-of="qtype"
+                                                                            data-variant="choice">Choice</span><span
+            data-variant-of="qtype" data-variant="yes-no">Yes/No</span><span data-variant-of="qtype"
+                                                                             data-variant="score">Score</span></span><span
+            class="font-semibold" data-slot="id"></span></button>
+</template>
+
+<template id="tpl-rcard">
+    <article class="card bg-base-100 border border-base-300">
+        <div class="card-body gap-3 p-5">
+            <div class="flex items-center gap-2">
+                <span class="status status-lg" data-model-color aria-hidden="true"></span>
+                <h2 class="font-semibold" data-slot="label">Model</h2>
+                <span class="badge badge-outline badge-sm ml-auto"><span data-variant-of="source"
+                                                                         data-variant="logprobs">reported</span><span
+                        data-variant-of="source" data-variant="sampled">estimated from <span data-slot="n"></span> runs</span></span>
+            </div>
+            <div class="flex items-baseline gap-2"><span class="text-2xl font-semibold tracking-tight"
+                                                         data-slot="answer"></span><span class="opacity-70"
+                                                                                         data-slot="confidence"></span>
+            </div>
+            <div class="flex flex-col gap-2" data-bars></div>
+            <p class="text-xs" data-ev hidden>expected value <strong data-slot="ev"></strong></p>
+            <p class="text-xs opacity-60 border-t border-base-300 pt-2.5">
+                <span data-variant-of="source" data-variant="logprobs"><span data-slot="residual"></span> of the probability fell outside the options.</span>
+                <span data-variant-of="source" data-variant="sampled">Share of <span
+                        data-slot="valid"></span> answers<span data-invalid-note hidden>, <span
+                        data-slot="invalid"></span> unusable left out</span>. Margin ±<span
+                        data-slot="band"></span>.</span>
+            </p>
+        </div>
+    </article>
+</template>
+
+<template id="tpl-bar">
+    <div class="bar-row"><span class="truncate text-sm" data-slot="label"></span>
+        <progress class="progress" max="1" value="0"></progress>
+        <span class="text-sm text-right" data-slot="value"></span></div>
+</template>
+
+<template id="tpl-error-row">
+    <li><span data-slot="label"></span>: <span data-slot="message"></span></li>
+</template>
+
+<template id="tpl-cost-row">
+    <tr>
+        <th scope="row"><span class="inline-flex items-center gap-1.5"><span class="status" data-model-color
+                                                                             aria-hidden="true"></span><span
+                data-slot="label"></span></span></th>
+        <td class="text-right" data-slot="calls"></td>
+        <td class="min-w-40">
+            <div class="flex items-center gap-2">
+                <progress class="progress progress-neutral flex-1" max="1" value="0"></progress>
+                <span class="w-14 text-right" data-slot="wall"></span></div>
+        </td>
+        <td class="text-right" data-slot="tokens"></td>
+        <td class="text-right" data-slot="cost"></td>
+    </tr>
+</template>
+
+<template id="tpl-model-tab">
+    <button type="button" role="tab" class="tab justify-start gap-2"><span class="status" data-model-color
+                                                                           aria-hidden="true"></span><span
+            data-slot="label"></span><span class="ml-auto text-xs opacity-70" data-depth><span data-slot="depth"></span>/<span
+            data-slot="depth-total"></span></span></button>
+</template>
+
+<template id="tpl-tally"><span class="tally-cell"></span></template>
+
+<template id="tpl-ko-row">
+    <div class="ko-row"><span class="text-sm ko-seg" data-slot="segment"></span>
+        <div class="ko-neg">
+            <div class="ko-bar"></div>
+        </div>
+        <div class="ko-pos">
+            <div class="ko-bar"></div>
+        </div>
+        <span class="text-sm text-right" data-slot="delta"></span></div>
+</template>
+
+<template id="tpl-bin">
+    <button type="button" class="rel-bin cursor-pointer disabled:cursor-default">
+        <div class="rel-acc"></div>
+        <div class="rel-conf"></div>
+        <span class="rel-label" data-slot="label"></span></button>
+</template>
+
+<template id="tpl-bin-label"><span data-slot="range"></span></template>
+
+<template id="tpl-summary-row">
+    <tr>
+        <th scope="row"><span class="inline-flex items-center gap-1.5"><span class="status" data-model-color
+                                                                             aria-hidden="true"></span><span
+                data-slot="label"></span></span></th>
+        <td class="text-xs"><span data-variant-of="source" data-variant="logprobs">reported</span><span
+                data-variant-of="source" data-variant="sampled">estimated from <span data-slot="n"></span> runs</span>
+        </td>
+        <td class="text-right" data-slot="acc"></td>
+        <td class="text-right" data-slot="conf"></td>
+        <td class="text-right" data-slot="gap"></td>
+        <td class="text-right" data-slot="ece"></td>
+        <td class="text-right" data-slot="brier"></td>
+        <td class="text-right" data-slot="count"></td>
+        <td class="text-right" data-slot="failed"></td>
+    </tr>
+</template>
+
+<template id="tpl-option-row">
+    <tr>
+        <th scope="row" data-slot="option"></th>
+        <td class="text-right" data-slot="support"></td>
+        <td class="text-right" data-slot="picked"></td>
+        <td class="text-right" data-slot="precision"></td>
+        <td class="text-right" data-slot="recall"></td>
+    </tr>
+</template>
+
+<template id="tpl-item-row">
+    <tr class="hover:bg-base-200 data-open:bg-base-200">
+        <td class="text-xs text-base-content/60" data-slot="n"></td>
+        <td class="max-w-xs truncate" data-slot="input"></td>
+        <td data-slot="truth"></td>
+        <td><span class="inline-flex items-center gap-1.5"><span data-slot="answer"></span><span
+                class="badge badge-xs badge-success" data-variant-of="outcome" data-variant="right">right</span><span
+                class="badge badge-xs badge-error" data-variant-of="outcome" data-variant="wrong">wrong</span><span
+                class="badge badge-xs badge-ghost" data-variant-of="outcome" data-variant="failed">failed</span></span>
+        </td>
+        <td class="text-right" data-slot="confidence"></td>
+        <td class="text-right">
+            <button type="button" class="btn btn-ghost btn-xs" data-open-item>Open</button>
+        </td>
+    </tr>
+</template>
+
+<template id="tpl-item-model">
+    <div class="card card-border bg-base-100">
+        <div class="card-body p-3 gap-2">
+            <div class="flex items-center gap-1.5 text-sm">
+                <span class="status" data-model-color aria-hidden="true"></span>
+                <span class="font-semibold" data-slot="label"></span>
+                <span class="ml-auto inline-flex items-center gap-1.5"><span data-slot="answer"></span> · <span
+                        data-slot="confidence"></span><span class="badge badge-xs badge-success"
+                        data-variant-of="outcome" data-variant="right">right</span><span
+                        class="badge badge-xs badge-error" data-variant-of="outcome" data-variant="wrong">wrong</span><span
+                        class="badge badge-xs badge-ghost" data-variant-of="outcome"
+                        data-variant="failed">failed</span></span>
+            </div>
+            <div class="flex flex-col gap-1" data-bars></div>
+        </div>
+    </div>
+</template>
+</body>
+</html>

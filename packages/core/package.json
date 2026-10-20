@@ -1,0 +1,16 @@
+{
+  "name": "@typed-decisions/core",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/model-contract.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openrouter/sdk": "1.4.21",
+    "zod": "4.6.5"
+  }
+}

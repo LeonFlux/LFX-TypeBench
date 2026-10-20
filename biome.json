@@ -1,0 +1,40 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": ["packages/**", "tests/**", "*.ts", "*.json"]
+  },
+  "formatter": { "enabled": true, "indentStyle": "space", "indentWidth": 2, "lineWidth": 120 },
+  "javascript": { "formatter": { "quoteStyle": "single" } },
+  "css": { "parser": { "tailwindDirectives": true } },
+  "linter": { "enabled": true, "rules": { "preset": "recommended" } },
+  "assist": { "enabled": true, "actions": { "source": { "organizeImports": "on" } } },
+  "overrides": [
+    {
+      "includes": ["packages/web/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": { "paths": { "@typed-decisions/server": "web may only import core." } }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/server/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": { "paths": { "@typed-decisions/web": "server may only import core." } }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

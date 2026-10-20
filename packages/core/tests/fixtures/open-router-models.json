@@ -1,0 +1,246 @@
+{
+  "data": [
+    {
+      "id": "google/gemma-4-31b-it",
+      "canonical_slug": "google/gemma-4-31b-it-20260402",
+      "hugging_face_id": "google/gemma-4-31B-it",
+      "name": "Google: Gemma 4 31B",
+      "created": 1775148486,
+      "description": "Gemma 4 31B Instruct is Google DeepMind's 30.7B dense multimodal model supportin",
+      "context_length": 262144,
+      "architecture": {
+        "modality": "text+image+video->text",
+        "input_modalities": ["image", "text", "video"],
+        "output_modalities": ["text"],
+        "tokenizer": "Gemma",
+        "instruct_type": null
+      },
+      "pricing": {
+        "prompt": "0.0000002",
+        "completion": "0.0000004"
+      },
+      "top_provider": {
+        "context_length": 262144,
+        "max_completion_tokens": 16384,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logit_bias",
+        "logprobs",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "default_parameters": {
+        "temperature": 1,
+        "top_p": 0.95,
+        "top_k": 64,
+        "frequency_penalty": null,
+        "presence_penalty": null,
+        "repetition_penalty": null
+      },
+      "supported_voices": null,
+      "knowledge_cutoff": null,
+      "expiration_date": null,
+      "links": {
+        "details": "/api/v1/models/google/gemma-4-31b-it-20260402/endpoints"
+      },
+      "benchmarks": {
+        "design_arena": [],
+        "artificial_analysis": {
+          "intelligence_index": 14.7,
+          "coding_index": 43.4,
+          "agentic_index": 4.2
+        }
+      },
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": false
+      }
+    },
+    {
+      "id": "anthropic/claude-sonnet-5.5",
+      "canonical_slug": "anthropic/claude-sonnet-5.5-20260928",
+      "hugging_face_id": null,
+      "name": "Anthropic: Claude Sonnet 5.5",
+      "created": 1790618686,
+      "description": "Claude Sonnet 5.5 is Anthropic's Sonnet-class model for well-scoped everyday wor",
+      "context_length": 1000000,
+      "architecture": {
+        "modality": "text+image+file->text",
+        "input_modalities": ["text", "image", "file"],
+        "output_modalities": ["text"],
+        "tokenizer": "Claude",
+        "instruct_type": null
+      },
+      "pricing": {
+        "prompt": "0.000002",
+        "completion": "0.00001",
+        "web_search": "0.01",
+        "input_cache_read": "0.0000001",
+        "input_cache_write": "0.0000025",
+        "input_cache_write_1h": "0.000004"
+      },
+      "top_provider": {
+        "context_length": 1000000,
+        "max_completion_tokens": 128000,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "supported_parameters": [
+        "include_reasoning",
+        "max_completion_tokens",
+        "max_tokens",
+        "reasoning",
+        "reasoning_effort",
+        "response_format",
+        "stop",
+        "structured_outputs",
+        "tool_choice",
+        "tools",
+        "verbosity"
+      ],
+      "default_parameters": {},
+      "supported_voices": null,
+      "knowledge_cutoff": null,
+      "expiration_date": null,
+      "links": {
+        "details": "/api/v1/models/anthropic/claude-sonnet-5.5-20260928/endpoints"
+      },
+      "benchmarks": {
+        "design_arena": [
+          {
+            "arena": "models",
+            "category": "3d",
+            "elo": 1460,
+            "win_rate": 69.7,
+            "rank": 2
+          },
+          {
+            "arena": "models",
+            "category": "codecategories",
+            "elo": 1365,
+            "win_rate": 60.6,
+            "rank": 3
+          },
+          {
+            "arena": "models",
+            "category": "dataviz",
+            "elo": 1381,
+            "win_rate": 66.3,
+            "rank": 2
+          },
+          {
+            "arena": "models",
+            "category": "gamedev",
+            "elo": 1475,
+            "win_rate": 72.6,
+            "rank": 1
+          },
+          {
+            "arena": "models",
+            "category": "uicomponent",
+            "elo": 1381,
+            "win_rate": 63.8,
+            "rank": 2
+          },
+          {
+            "arena": "models",
+            "category": "website",
+            "elo": 1327,
+            "win_rate": 56.1,
+            "rank": 5
+          }
+        ],
+        "artificial_analysis": {
+          "intelligence_index": 56,
+          "coding_index": null,
+          "agentic_index": null
+        }
+      },
+      "reasoning": {
+        "mandatory": true,
+        "supported_efforts": ["max", "xhigh", "high", "medium", "low"],
+        "default_effort": "high"
+      }
+    },
+    {
+      "id": "typesafe/jev-router",
+      "canonical_slug": "typesafe/jev-router",
+      "hugging_face_id": null,
+      "name": "TypeSafe: Jev Router",
+      "created": 1790363560,
+      "description": "Jev Router picks the best model and reasoning effort for each request, balancing",
+      "context_length": 1000000,
+      "architecture": {
+        "modality": "text+image+file+audio+video->text",
+        "input_modalities": ["audio", "file", "image", "text", "video"],
+        "output_modalities": ["text"],
+        "tokenizer": "Router",
+        "instruct_type": null
+      },
+      "pricing": {
+        "prompt": "-1",
+        "completion": "-1"
+      },
+      "top_provider": {
+        "context_length": null,
+        "max_completion_tokens": null,
+        "is_moderated": false
+      },
+      "per_request_limits": null,
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logit_bias",
+        "logprobs",
+        "max_completion_tokens",
+        "max_tokens",
+        "min_p",
+        "parallel_tool_calls",
+        "presence_penalty",
+        "reasoning",
+        "reasoning_effort",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_a",
+        "top_k",
+        "top_logprobs",
+        "top_p",
+        "verbosity"
+      ],
+      "default_parameters": {},
+      "supported_voices": null,
+      "knowledge_cutoff": null,
+      "expiration_date": null,
+      "links": {
+        "details": "/api/v1/models/typesafe/jev-router/endpoints"
+      }
+    }
+  ],
+  "total_count": 3,
+  "links": {
+    "next": null
+  }
+}

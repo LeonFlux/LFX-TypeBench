@@ -1,0 +1,23 @@
+{
+  "name": "typed-decisions",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.3.4",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm build && pnpm --parallel --filter @typed-decisions/web --filter @typed-decisions/server dev",
+    "build": "pnpm --filter @typed-decisions/web build",
+    "test": "vitest run",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "serve": "pnpm build && pnpm --filter @typed-decisions/server start"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.15",
+    "@types/node": "24.19.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.3"
+  }
+}

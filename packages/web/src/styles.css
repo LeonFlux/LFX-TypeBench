@@ -1,0 +1,224 @@
+@import "tailwindcss";
+@import "./theme.css";
+@plugin "daisyui" {
+  themes: false;
+}
+
+/* Only visuals daisyUI has no component for live here. Every color comes from
+   the active daisyUI theme; JS only sets data (--a, --h, --b, --neg, --pos)
+   and the model color (--c) through the .mc-* classes below. */
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+@utility section-label {
+  @apply text-xs font-semibold uppercase tracking-wide text-base-content/60;
+}
+
+.mc-primary {
+  --c: var(--color-primary);
+}
+.mc-secondary {
+  --c: var(--color-secondary);
+}
+.mc-accent {
+  --c: var(--color-accent);
+}
+.mc-info {
+  --c: var(--color-info);
+}
+.mc-success {
+  --c: var(--color-success);
+}
+.mc-warning {
+  --c: var(--color-warning);
+}
+
+[data-model-card][data-off] {
+  opacity: 0.55;
+}
+
+/* Probability bars: daisyUI progress inside a label / bar / value grid */
+.bar-row {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr) 3.5rem;
+  gap: 0.625rem;
+  align-items: center;
+}
+.bar-row:not([data-top]) .progress {
+  opacity: 0.45;
+}
+
+/* Heat tables: divergence and confusion matrices */
+.heat-table td,
+.heat-table thead th {
+  text-align: center;
+}
+.heat-table td {
+  min-width: 4.5rem;
+  height: 2.75rem;
+  background: color-mix(in oklab, var(--color-secondary) calc(var(--a, 0) * 100%), transparent);
+}
+.heat-table td[data-self] {
+  background: var(--color-base-200);
+}
+.heat-table td[data-dark] {
+  color: var(--color-secondary-content);
+}
+.heat-table td[data-diag] {
+  outline: 2px solid var(--c, var(--color-base-content));
+  outline-offset: -3px;
+  font-weight: 600;
+}
+
+/* Run tally */
+.tally {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(1.125rem, 1fr));
+  gap: 0.25rem;
+  max-width: 45rem;
+}
+.tally-cell {
+  aspect-ratio: 1;
+  border-radius: var(--radius-selector);
+  background: color-mix(in oklab, var(--c, var(--color-base-content)) 30%, transparent);
+}
+.tally-cell[data-top] {
+  background: var(--c, var(--color-base-content));
+}
+.tally-cell[data-invalid] {
+  background: transparent;
+  border: 1.5px solid color-mix(in oklab, var(--c, var(--color-base-content)) 45%, transparent);
+}
+
+/* Knockout: diverging bars around zero */
+.ko-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) 4rem;
+  gap: 0.625rem;
+  align-items: center;
+  min-height: 2.5rem;
+  border-bottom: 1px solid var(--color-base-300);
+}
+.ko-head {
+  min-height: 1.75rem;
+}
+.ko-neg,
+.ko-pos {
+  display: flex;
+  height: 0.875rem;
+}
+.ko-neg {
+  justify-content: flex-end;
+  border-right: 1px solid var(--color-base-content);
+}
+.ko-neg .ko-bar {
+  width: var(--neg, 0%);
+  background: var(--color-warning);
+}
+.ko-pos .ko-bar {
+  width: var(--pos, 0%);
+  background: var(--color-primary);
+}
+.ko-row[data-noise] {
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 6px,
+    color-mix(in oklab, var(--color-base-content) 6%, transparent) 6px 12px
+  );
+}
+.ko-seg {
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in oklab, var(--color-base-content) 45%, transparent);
+}
+.ko-row[data-failed] .ko-seg {
+  text-decoration-style: dotted;
+}
+
+/* Reliability diagram */
+.reliability {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 0.375rem 0.5rem;
+}
+.rel-y {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 16rem;
+  font-size: 0.6875rem;
+  opacity: 0.6;
+  text-align: right;
+}
+.rel-plot,
+.rel-x {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0 0.25rem;
+}
+.rel-plot {
+  height: 16rem;
+  border-left: 1px solid var(--color-base-content);
+  border-bottom: 1px solid var(--color-base-content);
+}
+.rel-x {
+  font-size: 0.6875rem;
+  opacity: 0.6;
+  text-align: center;
+  white-space: pre-line;
+}
+.rel-bin {
+  position: relative;
+  height: 100%;
+  background: var(--color-base-200);
+}
+.rel-acc {
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--h, 0%);
+  background: var(--c, var(--color-base-content));
+}
+.rel-conf {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  bottom: var(--b, 0%);
+  border-top: 2px dashed var(--color-base-content);
+}
+.rel-bin[data-empty] .rel-conf {
+  opacity: 0.25;
+}
+.rel-label {
+  position: absolute;
+  inset: 0.25rem 0 auto;
+  text-align: center;
+  font-size: 0.6875rem;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 1.75rem;
+  height: 0.75rem;
+  border-radius: var(--radius-selector);
+  background: var(--c, var(--color-base-content));
+}
+.legend-dash {
+  display: inline-block;
+  width: 1.125rem;
+  border-top: 2px dashed var(--color-base-content);
+}
+
+@media (max-width: 640px) {
+  .bar-row {
+    grid-template-columns: 5.5rem minmax(0, 1fr) 3rem;
+  }
+  .ko-row {
+    grid-template-columns: minmax(0, 1fr) 4.5rem 4.5rem 3.25rem;
+  }
+  .rel-label {
+    display: none;
+  }
+}
