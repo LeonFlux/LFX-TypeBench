@@ -12,3 +12,5 @@ short_description: See how AI models decide typed decisions
 # LFX TypeBench
 
 Run one type-check decisions against any mix of AI models and see **how** each model decided. The level of insight depends on model and provider.
+
+## 🤗 [https://huggingface.co/spaces/leonflux/LFX-TypeBench](https://huggingface.co/spaces/leonflux/LFX-TypeBench)
